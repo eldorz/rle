@@ -2,10 +2,7 @@
 #include <fstream>
 
 #include "rlencode.h"
-
-#define STDOUT_MODE 0
-#define OUTFILE_MODE 1
-#define START_FLAG -1
+#include "common.h"
 
 using namespace std;
 
@@ -48,9 +45,6 @@ int main (int argc, char **argv) {
   return 0;
 }
 
-void usage(char **argv) {
-  cerr << "Usage: " << argv[0] << " INFILE [OUTFILE]" << endl;
-}
 
 void encode(ifstream &infile, ofstream &outfile, int mode) {
 
@@ -95,7 +89,7 @@ void encode(ifstream &infile, ofstream &outfile, int mode) {
   // output the last character
   output_code(outfile, oldbyte, count, mode);
 
-  if (mode == STDOUT_MODE) cout << endl;
+  if (mode == STDOUT_MODE) cout << flush;
 
   return;
 }
