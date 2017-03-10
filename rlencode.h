@@ -5,7 +5,8 @@
 #include <fstream>
 
 void usage(char **argv);
-void outfile_encode(std::ifstream &infile, std::ofstream &outfile);
-void output_code(std::ofstream &outfile, char byte, unsigned int count);
+void encode(std::ifstream &infile, std::ofstream &outfile, int mode);
+void output_code(std::ofstream &outfile, char byte, unsigned int count, 
+  int mode);
 
 #endif

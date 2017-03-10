@@ -39,7 +39,7 @@ int main (int argc, char **argv) {
   }
 
   // perform encoding
-  if (mode == OUTFILE_MODE) outfile_encode(infile, outfile);
+  encode(infile, outfile, mode);
 
   // close files
   infile.close();
@@ -52,7 +52,7 @@ void usage(char **argv) {
   cerr << "Usage: " << argv[0] << " INFILE [OUTFILE]" << endl;
 }
 
-void outfile_encode(ifstream &infile, ofstream &outfile) {
+void encode(ifstream &infile, ofstream &outfile, int mode) {
 
   // read the first character
   char inbyte = 0;
@@ -75,7 +75,7 @@ void outfile_encode(ifstream &infile, ofstream &outfile) {
     if (inbyte > 127) {
       cerr << "Input file contains non-standard ASCII" << endl;
       infile.close();
-      outfile.close();
+      if (outfile) outfile.close();
       exit(1);
     }
 
@@ -83,7 +83,7 @@ void outfile_encode(ifstream &infile, ofstream &outfile) {
     if (inbyte == oldbyte) count++;
     // otherwise output code for previous character and reset count
     else if (oldbyte != START_FLAG) {
-      output_code(outfile, oldbyte, count);
+      output_code(outfile, oldbyte, count, mode);
       count = 1;
     }
 
@@ -93,31 +93,41 @@ void outfile_encode(ifstream &infile, ofstream &outfile) {
   }
 
   // output the last character
-  output_code(outfile, oldbyte, count);
+  output_code(outfile, oldbyte, count, mode);
+
+  if (mode == STDOUT_MODE) cout << endl;
 
   return;
 }
 
-void output_code(ofstream &outfile, char byte, unsigned int count) {
+void output_code(ofstream &outfile, char byte, unsigned int count, int mode) {
+
   // output the characters only if there are 2 or less
   if (count <= 2) {
-    while (--count > 0) outfile << byte;
+    while (count-- > 0) {
+      if (mode == OUTFILE_MODE) outfile << byte;
+      else cout << byte;
+    }
     return;
   }
   
   // otherwise output byte and count
-  outfile << byte;
+  if (mode == OUTFILE_MODE) outfile << byte;
+  else cout << byte;
   
-  while (count > 0x7F) {
-    // won't fit into seven bits, need to split
-    char least_sig = count & 0x7F;
-    // prepend a flag bit and output
-    least_sig |= 0x80;
-    outfile << least_sig;
-    count >>= 7;
-  }
+  if (mode == OUTFILE_MODE) {
+    while (count > 0x7F) {
+      // won't fit into seven bits, need to split
+      char least_sig = count & 0x7F;
+      // prepend a flag bit and output
+      least_sig |= 0x80;
+      outfile << least_sig;
+      count >>= 7;
+    }
 
-  // output last 7 bits
-  count |= 0x80;
-  outfile << (char)count;
+    // output last 7 bits
+    count |= 0x80;
+    outfile << (char)count;
+  }
+  else cout << "[" << count << "]";
 }
