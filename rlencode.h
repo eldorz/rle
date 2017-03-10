@@ -6,6 +6,6 @@
 
 void usage(char **argv);
 void outfile_encode(std::ifstream &infile, std::ofstream &outfile);
-void output_code(std::ofstream &outfile, char byte, int count);
+void output_code(std::ofstream &outfile, char byte, unsigned int count);
 
 #endif

@@ -5,6 +5,7 @@
 
 #define STDOUT_MODE 0
 #define OUTFILE_MODE 1
+#define START_FLAG -1
 
 using namespace std;
 
@@ -64,8 +65,8 @@ void outfile_encode(ifstream &infile, ofstream &outfile) {
     exit(1);
   }
     
-  char oldbyte = 255;
-  int count = 1;
+  char oldbyte = START_FLAG;
+  unsigned int count = 1;
 
   // read input stream one byte at a time
   while(infile) {
@@ -78,18 +79,45 @@ void outfile_encode(ifstream &infile, ofstream &outfile) {
       exit(1);
     }
 
-    // count the number of occurrences of this character
+    // increment count if same as before
     if (inbyte == oldbyte) count++;
-    else output_code(outfile, oldbyte, count);
+    // otherwise output code for previous character and reset count
+    else if (oldbyte != START_FLAG) {
+      output_code(outfile, oldbyte, count);
+      count = 1;
+    }
 
     // get a new character
     oldbyte = inbyte;
     infile.read(&inbyte,1);
   }
 
+  // output the last character
+  output_code(outfile, oldbyte, count);
+
   return;
 }
 
-void output_code(ofstream &outfile, char byte, int count) {
-  outfile << byte << " " << count << endl;
+void output_code(ofstream &outfile, char byte, unsigned int count) {
+  // output the characters only if there are 2 or less
+  if (count <= 2) {
+    while (--count > 0) outfile << byte;
+    return;
+  }
+  
+  // otherwise output byte and count
+  outfile << byte;
+  
+  while (count > 0x7F) {
+    // won't fit into seven bits, need to split
+    char least_sig = count & 0x7F;
+    // prepend a flag bit and output
+    least_sig |= 0x80;
+    outfile << least_sig;
+    count >>= 7;
+  }
+
+  // output last 7 bits
+  count |= 0x80;
+  outfile << (char)count;
 }
