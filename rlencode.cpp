@@ -105,7 +105,8 @@ void output_code(ofstream &outfile, char byte, unsigned int count, int mode) {
     return;
   }
   
-  // otherwise output byte and count
+  // otherwise output byte and count minus three
+  count -= 3;
   if (mode == OUTFILE_MODE) outfile << byte;
   else cout << byte;
   

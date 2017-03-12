@@ -81,8 +81,8 @@ void decode(ifstream &infile, ofstream &outfile, int mode) {
     }
     if (mode == STDOUT_MODE) cout << "[" << count << "]";
     else {
-      // note we've already printed one
-      --count;
+      // need to add three but note we've already printed one
+      count += 2;
       for (unsigned i = 0; i < count; ++i) {
 	outfile << current_char;
       }

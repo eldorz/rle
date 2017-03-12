@@ -6,6 +6,9 @@ all : rlencode rldecode
 debug : CFLAGS=-Wall -Werror -gdwarf-3 -std=c++11
 debug : all
 
+profile : CFLAGS=-Wall -Werror -pg -std=c++11
+profile : all
+
 rlencode : rlencode.o common.o
 	$(CC) $(CFLAGS) -o rlencode rlencode.o common.o
 
